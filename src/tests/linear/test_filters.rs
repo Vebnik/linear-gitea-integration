@@ -1,4 +1,3 @@
-
 #[tokio::test]
 async fn test_query_filters() {
     use crate::services::linear::types::Client;
@@ -33,10 +32,12 @@ async fn test_query_filters() {
         }
     "#;
 
-    let result = client.execute(query.to_string())
-        .await.unwrap();
+    let result = client.execute(query.to_string()).await.unwrap();
 
-    assert_eq!(&result["data"]["team"]["id"], "5557a5eb-b9cb-483d-89bd-8ff21073a6c6");
+    assert_eq!(
+        &result["data"]["team"]["id"],
+        "5557a5eb-b9cb-483d-89bd-8ff21073a6c6"
+    );
 }
 
 #[tokio::test]
@@ -69,8 +70,8 @@ async fn test_query_team() {
 
 #[tokio::test]
 async fn test_query_issue_by_title() {
-    use crate::services::linear::types::Issue;
     use crate::services::gitea::types::BranchData;
+    use crate::services::linear::types::Issue;
 
     dotenv::dotenv().expect("Error on read .env");
     env_logger::init();
@@ -78,7 +79,7 @@ async fn test_query_issue_by_title() {
     let brench_data = BranchData {
         title: "partial payments".to_string(),
         number: 60,
-        team_key: "PAY".to_string()
+        team_key: "PAY".to_string(),
     };
 
     let issues = Issue::get_by_branch(brench_data).await.unwrap();
@@ -87,25 +88,27 @@ async fn test_query_issue_by_title() {
         Some(issue) => {
             dbg!(issue);
             assert!(true);
-        },
-        None => assert!(false)
+        }
+        None => assert!(false),
     }
 }
 
 #[tokio::test]
 async fn test_query_state_by_team() {
-    use crate::services::linear::types::{Team, State};
+    use crate::services::linear::types::{State, Team};
 
     dotenv::dotenv().expect("Error on read .env");
     env_logger::init();
 
-    let team = Team::get_all()
-        .await.unwrap().first().unwrap().to_owned();
+    let team = Team::get_all().await.unwrap().first().unwrap().to_owned();
 
     let state = State::get_all_by_team(team)
-        .await.unwrap()
-        .iter().find(|el| el.name.eq("In Review"))
-        .unwrap().to_owned();
+        .await
+        .unwrap()
+        .iter()
+        .find(|el| el.name.eq("In Review"))
+        .unwrap()
+        .to_owned();
 
     dbg!(&state);
 

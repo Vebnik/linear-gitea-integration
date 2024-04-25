@@ -1,8 +1,4 @@
-use actix_web::{
-    error::ResponseError,
-    http::header::ContentType,
-    HttpResponse,
-};
+use actix_web::{error::ResponseError, http::header::ContentType, HttpResponse};
 use serde_json::json;
 
 #[derive(thiserror::Error, Debug)]
@@ -21,7 +17,6 @@ pub enum CustomError {
 
     #[error("Undefined behavior: {0}")]
     UbExtendError(String),
-
     // #[error("Not create tcp connection with client")]
     // ClientNotCreate,
 }

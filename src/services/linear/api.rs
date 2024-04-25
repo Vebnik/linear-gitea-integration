@@ -1,7 +1,10 @@
 use serde_json::{json, Value};
 
 use super::types::{Client, Issue, State, Team};
-use crate::{error::{CustomError, Result}, services::gitea::types::BranchData};
+use crate::{
+    error::{CustomError, Result},
+    services::gitea::types::BranchData,
+};
 
 impl Client {
     pub fn new(endpoint: String, key: String) -> Self {
@@ -17,9 +20,11 @@ impl Client {
             .header("Content-Type", "application/json")
             .body(payload.to_string())
             .send()
-            .await.map_err(|_| CustomError::UbError)?
+            .await
+            .map_err(|_| CustomError::UbError)?
             .json::<serde_json::Value>()
-            .await.map_err(|_| CustomError::UbError)?;
+            .await
+            .map_err(|_| CustomError::UbError)?;
 
         Ok(response)
     }
@@ -32,7 +37,8 @@ impl Issue {
 
         let client = Client::new(endpoint, key);
 
-        let query = format!(r#"
+        let query = format!(
+            r#"
             query Team {{
                 team(id: "{}") {{
                 id
@@ -57,7 +63,9 @@ impl Issue {
                 }}
                 }}
             }}
-        "#, team);
+        "#,
+            team
+        );
 
         let mut result = client.execute(query.to_string()).await?;
         let nodes_value = result["data"]["team"]["issues"]["nodes"].take();
@@ -73,7 +81,8 @@ impl Issue {
         let key = std::env::var("LINEAR_KEY").unwrap();
         let client = Client::new(endpoint, key);
 
-        let query = format!(r#"
+        let query = format!(
+            r#"
             query Issues {{
                 issues(filter: {{
                     title: {{containsIgnoreCase: "{}" }},
@@ -104,7 +113,9 @@ impl Issue {
                     }}
                 }}
             }}
-        "#, branch.title, branch.number, branch.team_key);
+        "#,
+            branch.title, branch.number, branch.team_key
+        );
 
         let mut result = client.execute(query.to_string()).await?;
         let nodes_value = result["data"]["issues"]["nodes"].take();
@@ -119,12 +130,13 @@ impl Issue {
         }
     }
 
-    pub async fn update_state(&self, state: State) -> Result<Self> {
+    pub async fn update_state(&self, state: State) -> Result<String> {
         let endpoint = std::env::var("LINEAR_URL").unwrap();
         let key = std::env::var("LINEAR_KEY").unwrap();
         let client = Client::new(endpoint, key);
 
-        let query = format!(r#"
+        let query = format!(
+            r#"
             mutation Mutation {{
                 issueUpdate(
                     id: "{}",
@@ -133,12 +145,14 @@ impl Issue {
                     issue {{ id }}
                 }}
             }}
-        "#, &self.id, state.id);
+        "#,
+            &self.id, state.id
+        );
 
         let mut result = client.execute(query.to_string()).await?;
         let nodes_value = result["data"]["issue"].take();
 
-        Ok(self.clone())
+        Ok(nodes_value["id"].to_string())
     }
 }
 
@@ -164,8 +178,8 @@ impl Team {
         let mut result = client.execute(query.to_string()).await?;
         let nodes_value = result["data"]["teams"]["nodes"].take();
 
-        let data = serde_json::from_value::<Vec<Self>>(nodes_value)
-            .map_err(|_| CustomError::UbError)?;
+        let data =
+            serde_json::from_value::<Vec<Self>>(nodes_value).map_err(|_| CustomError::UbError)?;
 
         Ok(data)
     }
@@ -177,7 +191,8 @@ impl State {
         let key = std::env::var("LINEAR_KEY").unwrap();
         let client = Client::new(endpoint, key);
 
-        let query = format!(r#"
+        let query = format!(
+            r#"
             query Query {{
                 workflowStates(filter: {{
                     team: {{id: {{eq: "{}" }}}},
@@ -189,7 +204,9 @@ impl State {
                     }}
                 }}
             }}
-        "#, team.id);
+        "#,
+            team.id
+        );
 
         let mut result = client.execute(query.to_string()).await?;
         let nodes_value = result["data"]["workflowStates"]["nodes"].take();

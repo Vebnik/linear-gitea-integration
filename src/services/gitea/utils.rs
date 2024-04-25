@@ -11,6 +11,6 @@ pub async fn extract_branch_data(label: String) -> Result<BranchData> {
     Ok(BranchData {
         title,
         team_key: branch_name[0].to_string(),
-        number: branch_name[1].parse().unwrap()
+        number: branch_name[1].parse().unwrap(),
     })
 }

@@ -18,7 +18,7 @@ pub struct Commit {
     pub removed: Option<String>,
     pub timestamp: String,
     pub url: String,
-    pub verification: Option<String>
+    pub verification: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -120,14 +120,14 @@ pub struct PullRequest {
     pub merged: bool,
     pub merged_at: Option<String>,
     pub merge_commit_sha: Option<String>,
-    pub merged_by:  Option<String>,
+    pub merged_by: Option<String>,
     pub base: Branch,
     pub head: Branch,
     pub merge_base: String,
     pub due_date: Option<String>,
     pub created_at: String,
     pub updated_at: String,
-    pub closed_at:  Option<String>,
+    pub closed_at: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -157,4 +157,10 @@ pub struct BranchData {
     pub team_key: String,
     pub number: i32,
     pub title: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct Client {
+    pub endpoint: String,
+    pub key: String,
 }

@@ -1,17 +1,17 @@
-use std::sync::Arc;
 use actix_cors::Cors;
-use actix_web::{middleware::Logger, App, HttpServer, web};
+use actix_web::{middleware::Logger, web, App, HttpServer};
 use log::info;
+use std::sync::Arc;
 
-mod services;
-mod tests;
+mod config;
 mod error;
 mod router;
-mod config;
+mod services;
+mod tests;
 
+use config::{AppState, Config};
+use error::{CustomError, Result};
 use router::init_api_service;
-use error::{Result, CustomError};
-use config::{Config, AppState};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -33,7 +33,9 @@ async fn main() -> Result<()> {
 
         info!("Create app instance");
         App::new()
-            .app_data(web::Data::new(AppState { config: Arc::clone(&config) }))
+            .app_data(web::Data::new(AppState {
+                config: Arc::clone(&config),
+            }))
             .wrap(Logger::default())
             .wrap(cors)
             .service(init_api_service(web::scope("/service")))
@@ -47,4 +49,3 @@ async fn main() -> Result<()> {
 
     Ok(())
 }
-

@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-
 #[derive(Debug)]
 pub struct Client {
     pub endpoint: String,
@@ -18,7 +17,7 @@ pub struct State {
     #[serde(alias = "type")]
     pub issue_type: String,
     pub id: String,
-    pub name: String
+    pub name: String,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
